@@ -556,6 +556,17 @@ def polygons_from_object(navmesh_obj: Object) -> tuple[list[NavPolygon], bool]:
     navmesh_obj_eval.to_mesh_clear()
 
     if compute_edges and first_adj_area_id_ref[0] > 0:
-        navmesh_obj.get("adj_area_ids")[0] = first_adj_area_id_ref[0]
 
+        # test fix for Blender error "index out of range"
+        # navmesh_obj.get("adj_area_ids")[0] = first_adj_area_id_ref[0]
+        adj = navmesh_obj.get("adj_area_ids")
+        if isinstance(adj, list):
+            if len(adj) == 0:
+                adj.append(first_adj_area_id_ref[0])
+            else:
+                adj[0] = first_adj_area_id_ref[0]
+        else:
+            navmesh_obj["adj_area_ids"] = [first_adj_area_id_ref[0]]
+        # end test code
+    
     return polygons_xml, has_water, is_dlc
